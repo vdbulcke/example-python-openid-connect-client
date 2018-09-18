@@ -125,7 +125,7 @@ class Client:
         except urllib.error.URLError as te:
             print("Could not exchange code for tokens")
             raise te
-        return json.loads(token_response.read())
+        return json.loads(token_response.read().decode('utf-8'))
 
     def urlopen(self, url, data=None, context=None):
         """
