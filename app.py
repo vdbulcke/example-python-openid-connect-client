@@ -24,7 +24,7 @@ from jwkest import BadSignature
 
 from client import Client
 from config import Config
-from tools import decode_token, generate_random_string
+from tools import decode_token, generate_random_string, get_ssl_context
 from validator import JwtValidator
 
 _app = Flask(__name__)
@@ -149,11 +149,12 @@ def call_api():
             user.api_response = None
             if user.access_token:
                 try:
+                    ctx = get_ssl_context(_config)
                     req = urllib.request.Request(_config['api_endpoint'])
                     req.add_header('User-Agent', 'CurityExample/1.0')
                     req.add_header('Authorization', 'Bearer %s' % user.access_token)
                     req.add_header('Accept', 'application/json')
-                    response = urllib.request.urlopen(req)
+                    response = urllib.request.urlopen(req, context=ctx)
                     user.api_response = {'code': response.code, 'data': response.read().decode()}
                 except urllib.error.HTTPError as e:
                     user.api_response = {'code': e.code, 'data': e.read().decode()}
